@@ -16,6 +16,6 @@ class Lesson extends Model
     }
     public function tag()
     {
-        $this->belongsToMany(tag::class);
+        $this->belongsToMany(Tag::class , "lessonstags" , 'lesson_id', 'tags_id');
     }
 }

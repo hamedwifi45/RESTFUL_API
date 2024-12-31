@@ -16,8 +16,6 @@ class LessonTagFactory extends Factory
      */
     public function definition(): array
     {
-        return [
-            //
-        ];
+        
     }
 }
