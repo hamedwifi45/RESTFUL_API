@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\UserLogedIn;
 use App\Http\Requests\LoginRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -14,9 +15,12 @@ use Illuminate\Support\Facades\Hash;
 class LoginController extends Controller
 {
     public function login(Request $request){
-    dd($request);
+    // dd($request);
     if(Auth::attempt(['email' => $request->email , 'password' => $request->password])){
         $user = Auth::user();
+        event(new UserLogedIn($user));
+
+
         $token = $user->createToken('Access Token')->plainTextToken;
         return response()->json([
             'success' => true,

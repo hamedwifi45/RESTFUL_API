@@ -11,9 +11,11 @@ class TagController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tags = TagResource::collection(Tag::all()) ;
+        $limit = $request->input('limit', 15);
+        $limit = $limit > 50 ? 50 : $limit;
+        $tags = TagResource::collection(Tag::paginate($limit)) ;
         return $tags->response()->setStatusCode(200);
     }
 
@@ -22,6 +24,7 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Tag::class);
         $tags = new TagResource(Tag::create($request->all()));
         return $tags->response()->setStatusCode(200);
     }
@@ -40,7 +43,7 @@ class TagController extends Controller
      */
     public function update(Request $request, Tag $tag)
     {
-        
+        $this->authorize('update', $tag);
         $tags = new TagResource($tag->update($request->all()));
         return $tags->response()->setStatusCode(200, 'the Tag update نجح');
     
@@ -51,6 +54,7 @@ class TagController extends Controller
      */
     public function destroy(Tag $tag)
     {
+        $this->authorize('delete', $tag);
         $tag->delete();
         return response(null, 204); // رمز الحالة: No Content
     }

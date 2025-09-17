@@ -12,9 +12,11 @@ class LessonController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $lesson = LessonResource::collection(Lesson::all());
+        $limit = $request->input('limit', 15);
+        $limit = $limit > 50 ? 50 : $limit; 
+        $lesson = LessonResource::collection(Lesson::paginate($limit));
         return $lesson->response()->setStatusCode(200);
     }
 
@@ -23,6 +25,7 @@ class LessonController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Lesson::class);
         $lesson = new LessonResource(Lesson::create($request->all()));
         return $lesson->response()->setStatusCode(200 , 'the lesson saved');
     }
@@ -51,6 +54,7 @@ class LessonController extends Controller
      */
     public function destroy(Lesson $lesson)
     {
+        $this->authorize('delete', $lesson);
         $lesson->delete();
         return response(null, 204); // رمز الحالة: No Content
     }

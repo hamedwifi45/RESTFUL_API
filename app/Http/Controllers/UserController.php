@@ -12,19 +12,21 @@ class UserController extends Controller
 {
     
     public function __construct(){
-        // $this->middleware('auth:sanctum')->except(['index' ]);
+        $this->middleware('auth:sanctum')->except(['index' ]);
     }
     /**
-     * Display a listing of the resource.
+     * عرض قائمة بجميع المستخدمين.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users =  UserResource::collection(User::all());
+        $limit = $request->input('limit', 15);
+        $limit = $limit > 50 ? 50 : $limit;
+        $users =  UserResource::collection(User::paginate($limit));
         return $users->response()->setStatusCode(200);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * تخزين مورد جديد في قاعدة البيانات.
      */
     public function store(Request $request)
     {
@@ -39,7 +41,7 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * عرض مورد محدد.
      */
     public function show(User $user)
     {
@@ -49,22 +51,24 @@ class UserController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * تحديث مورد محدد في قاعدة البيانات.
      */
     public function update(Request $request, User $user)
     {
-       
-        $users = new UserResource($user);
-        $users->update($request->all());
+        $this->authorize('update', $user);
+        $user->update($request->all());
+        $users = new UserResource($user->fresh());
         return $users->response()->setStatusCode(200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * حذف مورد محدد من قاعدة البيانات.
      */
     public function destroy(User $user)
     {
+        $this->authorize('update', $user);
         $user->delete();
-        return response(null, 204); // رمز الحالة: No Content
+        return response(null, 204); // رمز الحالة: لا يوجد محتوى
     }
 }
+
